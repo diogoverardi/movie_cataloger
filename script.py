@@ -56,7 +56,7 @@ def format_movie_name(movie_name, release_year):
 	#return movie_name.split(release_year)[0].replace("."," ").strip()
 	
 	# split the folder name in two parts and get the one before the release year
-	formatted_name = movie_name_pieces.replace("."," ").strip() = movie_name.split(release_year)[0]
+	formatted_name = movie_name.split(release_year)[0]
 	
 	# replaces all the . with blank spaces, and removes the space from the begginig and ending of the title
 	formatted_name = movie_name_pieces.replace("."," ").strip()
@@ -109,10 +109,14 @@ def main_menu():
 	print "3 - Rename all .mkv files"	
 	print "4 - Create genres folders (Drama, Action, Horros.....etc...)"	
 	
-	option = input("What would you like to do? ") 	
+	option = raw_input("What would you like to do? ")
 	
+	if option.isdigit() == False or len(option) >= 2 or int(option) < 1 or int(option) > 4:
+		print 'Invalid' 
+		main_menu()	
+
+
 	return option
-	
 
 if __name__ == '__main__':
 	main()
