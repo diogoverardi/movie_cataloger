@@ -7,6 +7,7 @@ from pprint import pprint
 main_direcorty_absolute_path = "/Users/diogoverardi/Movies/uncatalogued_movies/" 
 
 def main():
+#	loop main menu
 	main_menu()
 #	for y in os.walk(main_direcorty_absolute_path):
 #		rename_main_folders(y[1])
@@ -52,8 +53,10 @@ def rename_main_folders(folders_list):
 
 def format_movie_name(movie_name, release_year):
 	
+	#return movie_name.split(release_year)[0].replace("."," ").strip()
+	
 	# split the folder name in two parts and get the one before the release year
-	movie_name_pieces = movie_name.split(release_year)[0]
+	formatted_name = movie_name_pieces.replace("."," ").strip() = movie_name.split(release_year)[0]
 	
 	# replaces all the . with blank spaces, and removes the space from the begginig and ending of the title
 	formatted_name = movie_name_pieces.replace("."," ").strip()
