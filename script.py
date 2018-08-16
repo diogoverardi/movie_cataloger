@@ -107,10 +107,11 @@ def main_menu():
 	print "1 - Rename all my current folders"	
 	print "2 - Remove all the .txt files"	
 	print "3 - Rename all .mkv files"	
-	print "4 - Create genres folders (Drama, Action, Horros.....etc...)"	
+	print "4 - Create genres folders (Drama, Action, Horror.....etc...)"	
 	
 	option = raw_input("What would you like to do? ")
 	
+	# validate for no strings, double-digits, and a value between 1-4
 	if option.isdigit() == False or len(option) >= 2 or int(option) < 1 or int(option) > 4:
 		print 'Invalid' 
 		main_menu()	
