@@ -1,18 +1,8 @@
-import os
-import json
-import re
-import urllib
+import os,json,re,urllib
 from pprint import pprint
 
-main_direcorty_absolute_path = "/Users/diogoverardi/Movies/uncatalogued_movies/" 
-
-def main():
-#	loop main menu
-	main_menu()
-#	for y in os.walk(main_direcorty_absolute_path):
-#		rename_main_folders(y[1])
-#		print("\n")
-#		break
+main_directory_absolute_path 	= "/Users/diogoverardi/Movies/uncatalogued_movies/"
+extensions_to_delete 		= ['.dat','.txt','.jpg','.jpeg'] 
 		
 
 def rename_main_folders(folders_list):
@@ -26,37 +16,32 @@ def rename_main_folders(folders_list):
 			continue
 
 		
-#		original_movie_name 	= folder_name 
-#		movie_release_date 		= detected_movie_release_date(original_movie_name)
-#		formatted_movie_name 	= format_movie_name(original_movie_name, movie_release_date)
-#		movie_director 			= get_movie_director(formatted_movie_name, movie_release_date)
-#		
-#		new_folder_name = formatted_movie_name + ' - ' + movie_release_date + ' (' + movie_director + ')'
-#				
-#		print "Original Movie Name: %s" 	% original_movie_name
-#		print "Formatted Movie Name: %s"    % formatted_movie_name   
-#		print "Release Date: %s" 		 	% movie_release_date
-#		print "Movie Director: %s" 		 	% movie_director
-#		print "New Title: %s"               % new_title
-#		
-#		# go to the movies directory
-#		os.chdir(main_direcorty_absolute_path)
-#		
-#		# rename the folder
-#		os.rename(folder_name, new_folder_name)
-#
-#		pprint(new_title)
-#		
-#		break
+		original_movie_name 	= folder_name 
+		movie_release_date 	= detected_movie_release_date(original_movie_name)
+		formatted_movie_name 	= format_movie_name(original_movie_name, movie_release_date)
+		movie_director 		= get_movie_director(formatted_movie_name, movie_release_date)
 		
+		new_folder_name = formatted_movie_name + ' - ' + movie_release_date + ' (' + movie_director + ')'
+				
+		print "-------------------------------"		
+		print "Original Movie Name: %s" 	% original_movie_name
+		print "Formatted Movie Name: %s"    	% formatted_movie_name   
+		print "Release Date: %s" 	 	% movie_release_date
+		print "Movie Director: %s" 		% movie_director
+		print "New Title: %s"       	    	% new_folder_name
+		print "-------------------------------"	
+		
+		# go to the movies directory
+		os.chdir(main_directory_absolute_path)
+		
+		# rename the folder
+		os.rename(folder_name, new_folder_name)
 
 
 def format_movie_name(movie_name, release_year):
 	
-	#return movie_name.split(release_year)[0].replace("."," ").strip()
-	
 	# split the folder name in two parts and get the one before the release year
-	formatted_name = movie_name.split(release_year)[0]
+	movie_name_pieces = movie_name.split(release_year)[0]
 	
 	# replaces all the . with blank spaces, and removes the space from the begginig and ending of the title
 	formatted_name = movie_name_pieces.replace("."," ").strip()
@@ -72,7 +57,6 @@ def detected_movie_release_date(movie_name):
 			
 	# run trought the array until it finds the year in the title
 	date = [piece for piece in movie_name_pieces if len(piece) == 4 and re.match('.*([1-2][0-9]{3})', piece)][0]		
-	
 	return date if date else False		
 
 
@@ -102,10 +86,22 @@ def get_movie_director(movie_name, movie_year):
 	return data['Error'] if data['Response'] == 'False' else data['Director']
 	
 	
+# make it recursive to go into all sub-directories	
+def remove_unnecessary_files():
+	
+	parent_dir = os.listdir(main_directory_absolute_path)
+
+	for folder in parent_dir:
+		pprint(folder)
+		if folder.endswith(tuple(extensions_to_delete)):
+			os.remove(os.path.join(dir_name, folder))
+	
+	
 def main_menu():
+	
 	print "------- Welcome to the Movie Cataloger -------"
 	print "1 - Rename all my current folders"	
-	print "2 - Remove all the .txt files"	
+	print "2 - Remove all the .txt/.dat files"	
 	print "3 - Rename all .mkv files"	
 	print "4 - Create genres folders (Drama, Action, Horror.....etc...)"	
 	
@@ -114,12 +110,22 @@ def main_menu():
 	# validate for no strings, double-digits, and a value between 1-4
 	if option.isdigit() == False or len(option) >= 2 or int(option) < 1 or int(option) > 4:
 		print 'Invalid' 
-		main_menu()	
+		main_menu()
+		
+		
+	if int(option) == 1:
+		for y in os.walk(main_directory_absolute_path):
+			rename_main_folders(y[1])
+			break
+	elif int(option) == 2:
+		remove_unnecessary_files()	
+	elif int(option) == 3:
+		rename_mkv_files()
+	elif int(option) == 4:
+		create_genre_folders()				
 
-
-	return option
 
 if __name__ == '__main__':
-	main()
+	main_menu()
 	
 	
