@@ -1,8 +1,9 @@
 import os,json,re,urllib
 from pprint import pprint
 
-main_directory_absolute_path 	= "/Users/diogoverardi/Movies/uncatalogued_movies/"
+main_directory_absolute_path 	= ""
 extensions_to_delete 		= ['.dat','.txt','.jpg','.jpeg'] 
+config_file 			= 'config.txt'
 		
 
 def rename_main_folders(folders_list):
@@ -57,6 +58,7 @@ def detected_movie_release_date(movie_name):
 			
 	# run trought the array until it finds the year in the title
 	date = [piece for piece in movie_name_pieces if len(piece) == 4 and re.match('.*([1-2][0-9]{3})', piece)][0]		
+	
 	return date if date else False		
 
 
@@ -96,36 +98,57 @@ def remove_unnecessary_files():
 		if folder.endswith(tuple(extensions_to_delete)):
 			os.remove(os.path.join(dir_name, folder))
 	
+def create_genre_folders():
+
+	folders_list = os.listdir(main_directory_absolute_path)
 	
-def main_menu():
+	for folder in folders_list:
+				
+		movie_name = folder.split('-')[0]
+		
+		if movie_name == '.DS_Store':
+			continue
+		
+		print "the name of this movies is %s, and release year is %s" % (movie_name, movie_year)	
+
+def set_absolute_path():
+	
+	# open the file and read it
+	file = open(config_file, "r").read()
+	
+	if 'FOLDER_PATH=' not in file:
+		print 'File does not contain the right declaration!'
+		print 'The first line should be like this:'
+		print 'FOLDER_PATH="{absolute_path_to_movies_folder_here}"'
+		quit()
+
+	path = absolute_path 	= re.search('"(.+?)"', file).group(1)
+	absolute_path 		= absolute_path if os.path.isdir(absolute_path) == True else False
+	
+	if absolute_path == False:
+		print 'path (%s) not valid!' % path
+		quit()
+		
+	# change the value of the global variable
+	global main_directory_absolute_path
+	main_directory_absolute_path = absolute_path
+	
+	
+def main():
+	
+	set_absolute_path()
 	
 	print "------- Welcome to the Movie Cataloger -------"
-	print "1 - Rename all my current folders"	
-	print "2 - Remove all the .txt/.dat files"	
-	print "3 - Rename all .mkv files"	
-	print "4 - Create genres folders (Drama, Action, Horror.....etc...)"	
+	print "---------- Created by Diogo Verardi ----------"	
+	print "----------- ---------------------- -----------"
 	
-	option = raw_input("What would you like to do? ")
+	pprint(main_directory_absolute_path)
 	
-	# validate for no strings, double-digits, and a value between 1-4
-	if option.isdigit() == False or len(option) >= 2 or int(option) < 1 or int(option) > 4:
-		print 'Invalid' 
-		main_menu()
-		
-		
-	if int(option) == 1:
-		for y in os.walk(main_directory_absolute_path):
-			rename_main_folders(y[1])
-			break
-	elif int(option) == 2:
-		remove_unnecessary_files()	
-	elif int(option) == 3:
-		rename_mkv_files()
-	elif int(option) == 4:
-		create_genre_folders()				
-
+	for y in os.walk(main_directory_absolute_path):
+		rename_main_folders(y[1])
+		break
 
 if __name__ == '__main__':
-	main_menu()
+	main()
 	
 	
