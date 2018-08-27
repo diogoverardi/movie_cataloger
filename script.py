@@ -11,7 +11,7 @@ def rename_main_folders(folders_list):
 	for folder_name in folders_list:
 		
 		# check for folders already formatted
-		if folder_name.find('.') == -1 or folder_name.find('.') == 0:
+		if folder_name.find('.') == -1:
 			print "The current folder is already formatted:"
 			print "    %s" % folder_name
 			continue
@@ -23,7 +23,7 @@ def rename_main_folders(folders_list):
 		original_movie_name 	= folder_name 
 		movie_release_date 		= detected_movie_release_date(original_movie_name)
 		formatted_movie_name 	= format_movie_name(original_movie_name, movie_release_date)
-		movie_director 			= get_movie_director(formatted_movie_name, movie_release_date)
+		movie_director 			= get_movie_director(formatted_movie_name, movie_release_date).replace(".","").strip()
 		
 		new_folder_name = formatted_movie_name + ' - ' + movie_release_date + ' (' + movie_director + ')'
 				
@@ -36,10 +36,13 @@ def rename_main_folders(folders_list):
 		print "-------------------------------"	
 		
 		# go to the movies directory
-		os.chdir(main_directory_absolute_path)
+		os.chdir(os.path.abspath(main_directory_absolute_path))
 		
 		# rename the folder
-		os.rename(folder_name, new_folder_name)
+		try:
+			os.rename(folder_name, new_folder_name)
+		except OSError:
+			print("Oops! An error occured when trying to rename the folder")
 
 
 def format_movie_name(movie_name, release_year):
@@ -55,7 +58,7 @@ def format_movie_name(movie_name, release_year):
 		
 # returns the year when the movie was released or False		
 def detected_movie_release_date(movie_name):
-
+	
 	# divides the name on each .
 	movie_name_pieces = movie_name.split('.')	
 			
@@ -87,11 +90,8 @@ def get_movie_director(movie_name, movie_year):
 	response 	= urllib.urlopen(full_url)
 	data 		= json.loads(response.read())
 	
-	pprint(data)
-	pprint(full_url)
-	
-	# returns the Error message if it occurs , otherwise the Director's name
-	return data['Error'] if data['Response'] == 'False' else data['Director']
+	# return 'Unknown' if director's name is unavailable, otherwise the Director's name		
+	return 'Unknown' if data['Response'] == 'False' or data['Director'] == 'N/A' else data['Director'] 	
 	
 	
 # make it recursive to go into all sub-directories	
