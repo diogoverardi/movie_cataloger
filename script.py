@@ -2,8 +2,8 @@ import os,json,re,urllib
 from pprint import pprint
 
 main_directory_absolute_path 	= ""
-extensions_to_delete 		= ['.dat','.txt','.jpg','.jpeg'] 
-config_file 			= 'config.txt'
+extensions_to_delete 			= ['.dat','.txt','.jpg','.jpeg'] 
+config_file 					= 'config.txt'
 		
 
 def rename_main_folders(folders_list):
@@ -11,16 +11,19 @@ def rename_main_folders(folders_list):
 	for folder_name in folders_list:
 		
 		# check for folders already formatted
-		if folder_name.find('.') == -1:
+		if folder_name.find('.') == -1 or folder_name.find('.') == 0:
 			print "The current folder is already formatted:"
 			print "    %s" % folder_name
 			continue
 
-		
+		# invalid folde or file
+		if folder_name.find('.') == 0:
+			continue
+
 		original_movie_name 	= folder_name 
-		movie_release_date 	= detected_movie_release_date(original_movie_name)
+		movie_release_date 		= detected_movie_release_date(original_movie_name)
 		formatted_movie_name 	= format_movie_name(original_movie_name, movie_release_date)
-		movie_director 		= get_movie_director(formatted_movie_name, movie_release_date)
+		movie_director 			= get_movie_director(formatted_movie_name, movie_release_date)
 		
 		new_folder_name = formatted_movie_name + ' - ' + movie_release_date + ' (' + movie_director + ')'
 				
@@ -52,7 +55,7 @@ def format_movie_name(movie_name, release_year):
 		
 # returns the year when the movie was released or False		
 def detected_movie_release_date(movie_name):
-	
+
 	# divides the name on each .
 	movie_name_pieces = movie_name.split('.')	
 			
@@ -84,6 +87,9 @@ def get_movie_director(movie_name, movie_year):
 	response 	= urllib.urlopen(full_url)
 	data 		= json.loads(response.read())
 	
+	pprint(data)
+	pprint(full_url)
+	
 	# returns the Error message if it occurs , otherwise the Director's name
 	return data['Error'] if data['Response'] == 'False' else data['Director']
 	
@@ -98,19 +104,6 @@ def remove_unnecessary_files():
 		if folder.endswith(tuple(extensions_to_delete)):
 			os.remove(os.path.join(dir_name, folder))
 	
-def create_genre_folders():
-
-	folders_list = os.listdir(main_directory_absolute_path)
-	
-	for folder in folders_list:
-				
-		movie_name = folder.split('-')[0]
-		
-		if movie_name == '.DS_Store':
-			continue
-		
-		print "the name of this movies is %s, and release year is %s" % (movie_name, movie_year)	
-
 def set_absolute_path():
 	
 	# open the file and read it
@@ -123,7 +116,7 @@ def set_absolute_path():
 		quit()
 
 	path = absolute_path 	= re.search('"(.+?)"', file).group(1)
-	absolute_path 		= absolute_path if os.path.isdir(absolute_path) == True else False
+	absolute_path 			= absolute_path if os.path.isdir(absolute_path) == True else False
 	
 	if absolute_path == False:
 		print 'path (%s) not valid!' % path
@@ -141,8 +134,6 @@ def main():
 	print "------- Welcome to the Movie Cataloger -------"
 	print "---------- Created by Diogo Verardi ----------"	
 	print "----------- ---------------------- -----------"
-	
-	pprint(main_directory_absolute_path)
 	
 	for y in os.walk(main_directory_absolute_path):
 		rename_main_folders(y[1])
