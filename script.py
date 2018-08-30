@@ -95,14 +95,26 @@ def get_movie_director(movie_name, movie_year):
 	
 	
 # make it recursive to go into all sub-directories	
-def remove_unnecessary_files():
+def remove_unnecessary_files(directory, is_sub_directory = False):
 	
-	parent_dir = os.listdir(main_directory_absolute_path)
+	parent_directory = os.listdir(directory)
 
-	for folder in parent_dir:
-		pprint(folder)
-		if folder.endswith(tuple(extensions_to_delete)):
-			os.remove(os.path.join(dir_name, folder))
+	for file in parent_directory:
+
+		file_absolute_path = directory + '/' + file
+			
+		# recursive function for going inside the folders and deleting it there
+		if os.path.isdir(file_absolute_path) and is_sub_directory == False:
+			remove_unnecessary_files(file_absolute_path, True)
+
+		# actually deleting the files
+		if file.endswith(tuple(extensions_to_delete)):
+			try:
+				os.remove(file_absolute_path)
+				print "removing (%s)" % file_absolute_path
+			except OSError:
+				print "Oops! An error occured when trying to delete the file (%s)" % file_absolute_path
+
 	
 def set_absolute_path():
 	
@@ -130,7 +142,7 @@ def set_absolute_path():
 def main():
 	
 	set_absolute_path()
-	
+		
 	print "------- Welcome to the Movie Cataloger -------"
 	print "---------- Created by Diogo Verardi ----------"	
 	print "----------- ---------------------- -----------"
@@ -138,7 +150,10 @@ def main():
 	for y in os.walk(main_directory_absolute_path):
 		rename_main_folders(y[1])
 		break
-
+		
+	remove_unnecessary_files(main_directory_absolute_path)
+	
+		
 if __name__ == '__main__':
 	main()
 	
