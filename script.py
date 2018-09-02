@@ -3,6 +3,7 @@ from pprint import pprint
 
 main_directory_absolute_path 	= ""
 extensions_to_delete 			= ['.dat','.txt','.jpg','.jpeg'] 
+extensions_to_rename 			= ['.mkv', '.mp4', '.mov'] 
 config_file 					= 'config.txt'
 		
 
@@ -115,7 +116,30 @@ def remove_unnecessary_files(directory, is_sub_directory = False):
 			except OSError:
 				print "Oops! An error occured when trying to delete the file (%s)" % file_absolute_path
 
+
+def rename_movie_files(directory, folder_name = None, is_sub_directory = False):
 	
+	parent_directory = os.listdir(directory)
+
+	for file in parent_directory:
+
+		folder_absolute_path = directory + '/' + file
+		
+		if os.path.isdir(folder_absolute_path) and is_sub_directory == False:
+			rename_movie_files(folder_absolute_path, file, True)
+		
+		# actually renaming the files
+		if file.endswith(tuple(extensions_to_rename)):
+			
+			file_with_extension = directory + '/' + folder_name + os.path.splitext(file)[-1].lower()
+			
+			try:
+				os.rename(folder_absolute_path, file_with_extension)
+				print "renaming from (%s) to (%s)" % (folder_absolute_path, folder_name)
+			except OSError:
+				print "Oops! An error occured when trying to rename the file (%s)" % folder_absolute_path	
+			
+		
 def set_absolute_path():
 	
 	# open the file and read it
@@ -152,6 +176,7 @@ def main():
 		break
 		
 	remove_unnecessary_files(main_directory_absolute_path)
+	rename_movie_files(main_directory_absolute_path)
 	
 		
 if __name__ == '__main__':
